@@ -76,6 +76,17 @@ def create_reservation():
             409,
         )
 
+    duplicate = Reservation.query.filter_by(
+        user_id=user_id,
+        book_id=book_id,
+        status=ReservationStatus.active,
+    ).first()
+    if duplicate:
+        return error_response(
+            f"El usuario {user_id} ya tiene una reserva activa para '{book.title}'.",
+            409,
+        )
+        
     reservation = Reservation(
         user_id=user_id,
         book_id=book_id,
