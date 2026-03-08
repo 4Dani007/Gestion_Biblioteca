@@ -1,53 +1,59 @@
-# Library Management System
+# Sistema de Gestión de Biblioteca
 
-A minimal Flask backend designed as a foundation for QA testing practices,
-including unit tests, integration tests, and system tests.
-
----
-
-## Technology Stack
-
-| Layer       | Technology          |
-|-------------|---------------------|
-| Language    | Python 3.11         |
-| Framework   | Flask 3.x           |
-| Database    | SQLite              |
-| ORM         | SQLAlchemy 2.x      |
-| Test runner | Pytest              |
+Backend minimalista en Flask diseñado como base para prácticas de QA, incluyendo pruebas unitarias, de integración y de sistema. El proyecto incorpora defectos intencionales para ser detectados mediante testing.
 
 ---
 
-## Project Structure
+## Stack tecnológico
+
+| Capa          | Tecnología        |
+|---------------|-------------------|
+| Lenguaje      | Python 3.11       |
+| Framework     | Flask 3.x         |
+| Base de datos | SQLite            |
+| ORM           | SQLAlchemy 2.x    |
+| Testing       | Pytest            |
+| Documentación | Swagger UI (Flasgger) |
+
+---
+
+## Estructura del proyecto
 
 ```
 library-system/
 ├── app/
-│   ├── __init__.py          # Application factory (create_app)
-│   ├── config.py            # Environment-specific configuration classes
-│   ├── database.py          # SQLAlchemy db instance
-│   ├── models.py            # ORM models: User, Book, Loan, Reservation
+│   ├── __init__.py          # Application factory (create_app) + Swagger
+│   ├── config.py            # Configuraciones por entorno
+│   ├── database.py          # Instancia de SQLAlchemy
+│   ├── models.py            # Modelos ORM: User, Book, Loan, Reservation
+│   ├── seeds.py             # Datos de prueba iniciales
+│   ├── utils.py             # Helpers: validaciones y respuestas estándar
 │   └── routes/
-│       ├── auth_routes.py         # POST /api/auth/register|login|logout
+│       ├── auth_routes.py         # POST /api/auth/register|login
 │       ├── book_routes.py         # CRUD /api/books/
-│       ├── loan_routes.py         # /api/loans/ + return
-│       ├── reservation_routes.py  # /api/reservations/ + cancel/fulfill
+│       ├── loan_routes.py         # /api/loans/borrow|return
+│       ├── reservation_routes.py  # /api/reservations/
 │       └── report_routes.py       # GET /api/reports/...
 ├── tests/
-│   ├── conftest.py          # Pytest fixtures (app, client, db_session)
-│   ├── test_auth.py         # Auth endpoint tests
-│   ├── test_books.py        # Book endpoint tests
-│   ├── test_loans.py        # Loan endpoint tests
-│   └── test_reservations.py # Reservation endpoint tests
+│   ├── conftest.py          # Fixtures de Pytest (app, client, db_session)
+│   ├── test_unit.py         # Pruebas unitarias
+│   ├── test_integration.py  # Pruebas de integración
+│   ├── test_system.py       # Pruebas de sistema (flujo completo)
+│   ├── test_auth.py         # Pruebas de autenticación
+│   ├── test_books.py        # Pruebas de libros
+│   ├── test_loans.py        # Pruebas de préstamos
+│   ├── test_reservations.py # Pruebas de reservas
+│   └── test_reports.py      # Pruebas de reportes
 ├── requirements.txt
-├── run.py                   # Entry point: python run.py
+├── run.py                   # Punto de entrada: python run.py
 └── README.md
 ```
 
 ---
 
-## Getting Started
+## Instalación y ejecución
 
-### 1. Create and activate a virtual environment
+### 1. Crear y activar entorno virtual
 
 ```bash
 python -m venv venv
@@ -59,132 +65,140 @@ venv\Scripts\activate
 source venv/bin/activate
 ```
 
-### 2. Install dependencies
+### 2. Instalar dependencias
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Run the development server
+### 3. Iniciar el servidor de desarrollo
 
 ```bash
 python run.py
 ```
 
-The API will be available at `http://localhost:5000`.
+La API estará disponible en `http://localhost:5000`.
+
+La documentación Swagger estará en `http://localhost:5000/apidocs/`.
 
 ---
 
-## API Endpoints
+## Endpoints disponibles
 
-| Method | URL                              | Description                    |
-|--------|----------------------------------|--------------------------------|
-| POST   | /api/auth/register               | Register a new user            |
-| POST   | /api/auth/login                  | Authenticate and get a token   |
-| POST   | /api/auth/logout                 | Invalidate current session     |
-| GET    | /api/books/                      | List all books                 |
-| POST   | /api/books/                      | Add a new book                 |
-| GET    | /api/books/\<id\>                | Get a specific book            |
-| PUT    | /api/books/\<id\>                | Update a book                  |
-| DELETE | /api/books/\<id\>                | Delete a book                  |
-| GET    | /api/loans/                      | List loans                     |
-| POST   | /api/loans/                      | Borrow a book                  |
-| GET    | /api/loans/\<id\>                | Get a specific loan            |
-| PATCH  | /api/loans/\<id\>/return         | Return a borrowed book         |
-| GET    | /api/reservations/               | List reservations              |
-| POST   | /api/reservations/               | Place a reservation            |
-| GET    | /api/reservations/\<id\>         | Get a specific reservation     |
-| PATCH  | /api/reservations/\<id\>/cancel  | Cancel a reservation           |
-| PATCH  | /api/reservations/\<id\>/fulfill | Fulfill a reservation          |
-| GET    | /api/reports/overdue-loans       | Overdue loans report           |
-| GET    | /api/reports/popular-books       | Most borrowed books report     |
-| GET    | /api/reports/active-users        | Most active users report       |
-| GET    | /api/reports/availability        | Book availability summary      |
-
-> All endpoints currently return `501 Not Implemented` — business logic will
-> be added incrementally once tests are defined.
+| Método | URL                        | Descripción                        |
+|--------|----------------------------|------------------------------------|
+| GET    | /                          | Índice de endpoints disponibles    |
+| POST   | /api/auth/register         | Registrar nuevo usuario            |
+| POST   | /api/auth/login            | Autenticar usuario                 |
+| GET    | /api/books/                | Listar todos los libros            |
+| GET    | /api/books/search?q=       | Buscar libros por título o autor   |
+| POST   | /api/books/                | Agregar un libro                   |
+| PUT    | /api/books/\<id\>          | Actualizar un libro                |
+| POST   | /api/loans/borrow          | Realizar un préstamo               |
+| POST   | /api/loans/return          | Devolver un libro prestado         |
+| GET    | /api/reservations/         | Listar reservas                    |
+| POST   | /api/reservations/         | Crear una reserva                  |
+| GET    | /api/reports/loans         | Historial de préstamos             |
+| GET    | /api/reports/popular-books | Libros más prestados               |
 
 ---
 
-## Running Tests
+## Ejecutar pruebas
 
 ```bash
 pytest
 ```
 
-Run with verbose output:
+Con salida detallada:
 
 ```bash
 pytest -v
 ```
 
-Run a specific test file:
+Ejecutar solo los archivos nuevos de QA:
 
 ```bash
-pytest tests/test_books.py -v
+pytest tests/test_unit.py tests/test_integration.py tests/test_system.py -v
 ```
 
-Run only tests that are not skipped:
+Ejecutar un grupo específico:
 
 ```bash
-pytest -v -k "not skip"
+pytest tests/test_integration.py::TestReturnUpdatesLoanStatus -v
 ```
 
 ---
 
-## Configuration
+## Resultado esperado de las pruebas
 
-Three environments are available, controlled by the `FLASK_ENV` variable:
+El proyecto contiene **defectos intencionales** para ser detectados mediante testing. Al ejecutar la suite completa se espera:
 
-| Environment   | Database            | Debug |
-|---------------|---------------------|-------|
-| `development` | `library_dev.db`    | On    |
-| `testing`     | In-memory (`:memory:`) | On |
-| `production`  | `library.db`        | Off   |
+```
+60 passed, 9 failed
+```
+
+Los tests que fallan exponen defectos reales del sistema. Consulta los Issues del repositorio para ver el detalle de cada uno.
+
+---
+
+## Defectos conocidos
+
+| Issue | Descripción | Archivo afectado |
+|-------|-------------|------------------|
+| #1 | Se permiten reservas duplicadas para el mismo usuario y libro | `reservation_routes.py` |
+| #2 | Se puede prestar un libro con 0 copias disponibles | `loan_routes.py` |
+| #3 | Devolver un libro no restaura `available_copies` | `loan_routes.py` |
+| #4 | La búsqueda de libros es sensible a mayúsculas | `book_routes.py` |
+| #5 | Se permiten registros con e-mail duplicado | `auth_routes.py`, `models.py` |
+
+---
+
+## Configuración por entorno
+
+| Entorno       | Base de datos         | Debug |
+|---------------|-----------------------|-------|
+| `development` | `library_dev.db`      | Sí    |
+| `testing`     | En memoria (`:memory:`) | Sí  |
+| `production`  | `library.db`          | No    |
 
 ```bash
-# Example: run in production mode
+# Ejemplo: ejecutar en modo producción
 FLASK_ENV=production python run.py
 ```
 
 ---
 
-## Testing Strategy
-
-### Unit Tests
-Test pure functions (password hashing, validation helpers) in isolation,
-without a database or HTTP server.
-
-### Integration Tests
-Use the Flask test client and an in-memory SQLite database to test
-request/response contracts and ORM interactions end-to-end.
-
-### System Tests
-Will cover full user workflows (e.g., register → login → borrow book →
-return book) against a running server instance.
-
----
-
-## Database Models
+## Modelos de base de datos
 
 ```
-User          Book
-────────      ────────
-id            id
-username      title
-email         author
-password      isbn
-role          total_copies
-created_at    available_copies
-              created_at
+User                    Book
+──────────────          ──────────────────
+id                      id
+name                    title
+email                   author
+password (hash)         isbn
+role                    total_copies
+created_at              available_copies
 
 Loan                    Reservation
-────────────────        ────────────────
+──────────────────      ──────────────────
 id                      id
 user_id (FK → User)     user_id (FK → User)
 book_id (FK → Book)     book_id (FK → Book)
-loaned_at               reserved_at
-due_date                expires_at
-returned_at             status
+loan_date               reservation_date
+return_date             status
 status
 ```
+
+---
+
+## Estrategia de pruebas
+
+### Pruebas unitarias (`test_unit.py`)
+Verifican operaciones individuales a través del cliente HTTP: crear usuario, agregar libro, buscar libro, reservar libro.
+
+### Pruebas de integración (`test_integration.py`)
+Verifican que las operaciones producen los efectos correctos en la base de datos: decrementar copias al prestar, restaurar copias al devolver, prevenir reservas duplicadas.
+
+### Pruebas de sistema (`test_system.py`)
+Simulan el flujo completo de un usuario: registro → búsqueda → reserva → préstamo → devolución.
